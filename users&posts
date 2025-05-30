@@ -1,0 +1,141 @@
+/ -----------------------------------------------------------------------------
+// Клиентское SPA «Пользователи и их посты»
+// Использует бесплатный API JSONPlaceholder.
+// -----------------------------------------------------------------------------
+// HTML-ожидания:
+// <div id="users-list"></div>  – контейнер для списка пользователей (слева)
+// <div id="posts-list"></div>  – контейнер для постов (справа)
+// CSS-классы (можете настроить на вкус):
+// .user-card, .active-user, .post-card, .post-title, .post-body
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// 1. Универсальная функция запроса данных
+// -----------------------------------------------------------------------------
+/
+ * Загружает JSON с заданного URL.
+ * Если сервер ответил не 2xx — бросает ошибку, чтобы её поймала верхняя логика.
+ * Возвращает распарсенный объект или undefined при ошибке сети.
+ * @param {string} url – адрес эндпоинта
+ * @returns {Promise<any|undefined>}
+ */
+async function fetchData(url) {
+    try {
+        const response = await fetch(url);          // network fetch
+
+        if (!response.ok) {                         // HTTP-проверка
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();               // JSON → объект
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        // Возвращаем undefined, чтобы вызов не «упал» и приложение шло дальше.
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 2. Рендер списка пользователей
+// -----------------------------------------------------------------------------
+/
+ * Создаёт карточку на каждого user и вешает обработчик клика.
+ * @param {Array<{id:number,name:string,username:string}>} users
+ */
+function displayUsers(users) {
+    const usersList = document.getElementById('users-list');
+    usersList.innerHTML = '';                       // очищаем контейнер
+
+    users.forEach(user => {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        card.textContent = ${user.name} (${user.username});
+        card.dataset.userId = user.id;              // храним id в data-атрибуте
+
+        // --- Обработчик выбора пользователя ----------------------------------
+        card.addEventListener('click', () => {
+            // 1) снимаем подсветку со всех
+            document.querySelectorAll('.user-card')
+                .forEach(c => c.classList.remove('active-user'));
+            // 2) подсвечиваем текущего
+            card.classList.add('active-user');
+            // 3) загружаем его посты
+            fetchPosts(user.id);
+        });
+
+        usersList.appendChild(card);
+    });
+}
+// -----------------------------------------------------------------------------
+// 3. Рендер постов выбранного пользователя
+// -----------------------------------------------------------------------------
+/
+ * Выводит карточки постов или сообщение «нет постов».
+ * @param {Array<{title:string,body:string}>} posts
+ */
+function displayPosts(posts) {
+    const postsList = document.getElementById('posts-list');
+    postsList.innerHTML = '';                       // стираем старые посты
+
+    if (posts.length === 0) {
+        postsList.innerHTML = '<p>No posts found for this user.</p>';
+        return;
+    }
+
+    posts.forEach(post => {
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+
+        const title = document.createElement('div');
+        title.className = 'post-title';
+        title.textContent = post.title;
+
+        const body = document.createElement('div');
+        body.className = 'post-body';
+        body.textContent = post.body;
+
+        postCard.appendChild(title);
+        postCard.appendChild(body);
+        postsList.appendChild(postCard);
+    });
+}
+
+// -----------------------------------------------------------------------------
+// 4. Получение и фильтрация постов по userId
+// -----------------------------------------------------------------------------
+/
+ * Загружает все посты, фильтрует по userId и выводит.
+ * @param {number} userId
+ */
+async function fetchPosts(userId) {
+    const posts = await fetchData('https://jsonplaceholder.typicode.com/posts');
+    if (!posts) return;                             // сеть отвалилось
+
+    const userPosts = posts.filter(p => p.userId === userId);
+    displayPosts(userPosts);
+}
+
+// -----------------------------------------------------------------------------
+// 5. Инициализация приложения
+// -----------------------------------------------------------------------------
+/**
+ * Точка входа – вызывается один раз при загрузке скрипта.
+ * Загружает пользователей, рендерит их и выбирает первого по умолчанию.
+ */
+async function init() {
+    const users = await fetchData('https://jsonplaceholder.typicode.com/users');
+    if (!users) return;                             // сеть отвалилось
+
+    displayUsers(users);
+
+    if (users.length > 0) {
+        // Подсвечиваем и выводим посты первого пользователя
+        const firstCard = document.querySelector('.user-card');
+        firstCard.classList.add('active-user');
+        fetchPosts(users[0].id);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 6. Запуск
+// -----------------------------------------------------------------------------
+init();
