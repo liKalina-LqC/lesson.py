@@ -1,0 +1,14 @@
+print("\n4. Длина числа\n")
+
+while True:
+    user_input = input("Введите число: → ")
+    
+    if user_input == 'exit':
+        print("Выход из программы...")
+        break
+    
+    if user_input.lstrip('-').isdigit():
+        num_length = len(user_input.lstrip('-')) 
+        print(f"В этом числе {num_length} цифры." if num_length != 1 else f"В этом числе {num_length} цифра.")
+    else:
+        print("Ошибка")
