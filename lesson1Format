@@ -1,0 +1,13 @@
+print("1. Форматирование строк\n")
+
+name = input("Ваше имя: ")
+surname = input("Фамилия: ")
+age = input("Возраст: ")
+
+# Вывод с использованием метода format()
+print("\nРеализация через format:")
+print("Ваше имя: {0}, Фамилия: {1}, Возраст: {2} лет".format(name, surname, age))
+
+# Вывод с использованием f-string
+print("\nРеализация через f-string:")
+print(f"Ваше имя: {name}, Фамилия: {surname}, Возраст: {age} лет")
