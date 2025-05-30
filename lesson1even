@@ -1,0 +1,17 @@
+print("\n2. Четность числа\n")
+
+user_input = input("Введите число: ")
+
+try:
+    number = int(user_input)
+    
+    if number < 0:
+        print("Ошибка: введено отрицательное число")
+    else:
+        if number % 2 == 0:
+            print(f"Число {number} является четным")
+        else:
+            print(f"Число {number} не является четным")
+
+except ValueError:
+    print("Ошибка")
