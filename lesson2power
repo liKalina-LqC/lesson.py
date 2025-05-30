@@ -1,0 +1,19 @@
+print("1. Возведение в степень\n")
+
+elements = input("Введите числа через пробел: ").split()
+power = int(input("Введите степень: "))
+
+result = []
+
+for element in elements:
+    try:
+        num = float(element)
+        powered = num ** power
+        #если число целое, выводим без точки (по красоте)
+        if powered.is_integer():
+            powered = int(powered)
+        result.append(str(powered))
+    except ValueError:
+        result.append(element * power)
+
+print("Вывод:", " ".join(result))
