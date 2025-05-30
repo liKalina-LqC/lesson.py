@@ -1,0 +1,17 @@
+print("\n3. Проверка возраста\n")
+
+user_input = input("Введите ваш возраст: ")
+
+try:
+    number = int(user_input)
+    
+    if number < 0:
+        print("Ошибка")
+    else:
+        if number >= 18:
+            print("Вы совершеннолетний.")
+        else:
+            print("Вы несовершеннолетний.")
+
+except ValueError:
+    print("Ошибка")
